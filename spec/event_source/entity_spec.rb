@@ -1,20 +1,49 @@
 require 'spec_helper'
 
 describe EventSource::Entity do
+    before :each do
+        class Account
+            include EventSource::Entity
+
+            on_event :deposit do |arg1, arg2|
+                "#{arg1}#{arg2}"
+            end
+        end
+
+        @acct = Account.create
+    end
+
     describe 'when creating a new entity' do
         it 'should add a unique id to the entity' do 
-            class Account
-                include EventSource::Entity
-                self
-            end
-
-            acct = Account.create
-            acct.uid.should_not be_nil
+            @acct.uid.should_not be_nil
         end
     end
 
-    describe 'when registering events'
-    describe 'when calling event methods'
+    describe 'when registering events' do
+        it 'should create a method with the same name as the event' do
+            @acct.methods.should include(:deposit)
+        end
+
+        it 'should create the method with all require arguments' do
+            @acct.deposit(1, 2).should == '12'
+        end
+    end
+
+    describe 'when calling event methods' do
+        it 'should start a recording of state changes' do
+            class Client
+                include EventSource::Entity
+
+                on_event :noop do 
+                end
+            end
+
+            @client = Client.create
+            @client.noop
+
+            @client.attributes.keys.should be_empty
+        end
+    end
 end
 
 
@@ -25,16 +54,11 @@ end
 #
 #   attributes :balance #, ...
 #
-#   on :deposit do |amount|
+#   on_event :deposit do |amount|
 #     new_balance = amount + @balance
 #     # do some validation
 #
 #     set_balance new_balance
-#   end
-#
-#   on :deposit do |amount|
-#     # This is version 2
-#     # do more stuff
 #   end
 # end
 #
