@@ -36,6 +36,8 @@ describe EventSource::Entity do
                 extend EventSource::Entity::ClassMethods
                 include EventSource::Entity
 
+                attr_accessor :first_name
+
                 on_event :noop do 
                 end
 
@@ -49,21 +51,19 @@ describe EventSource::Entity do
 
         it 'should start a recording of state changes' do
             @client.noop
-            @client.attributes.keys.should be_empty
+            @client.entity_changes.keys.should be_empty
         end
 
-        it 'should update attribute xxx when calling set(:xxx)' do
+        it 'should add xxx to entity changes when calling set(:xxx)' do
             name = 'Louis'
             @client.change_first_name name
-            @client.attributes[:first_name].should == name
+            @client.entity_changes[:first_name].should == name
         end
-    end
 
-    describe 'when reading attributes' do
-        it 'should return the right value' do
-            name = 'account1'
-            @acct.set(:name) {name}
-            @acct.get(:name).should == name
+        it 'should set xxx when set(:xxx) is called' do
+            name = 'Louis'
+            @client.change_first_name name
+            @client.first_name.should == name
         end
     end
 end

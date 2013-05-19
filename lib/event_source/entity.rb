@@ -16,21 +16,19 @@ module EventSource
         end
 
         attr_reader :uid,
-                    :attributes
+                    :entity_changes
 
         def set(attr_name, &block)
-            @attributes[attr_name.to_sym] = block.call
-        end
-
-        def get(attr_name)
-            @attributes[attr_name.to_sym]
+            val = block.call
+            @entity_changes[attr_name.to_sym] = val
+            self.send("#{attr_name}=", val)
         end
 
         private
 
         def initialize
             @uid = EventSource::UIDGenerator.generate_id
-            @attributes = Hash.new
+            @entity_changes = Hash.new
         end
     end
 end
