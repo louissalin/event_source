@@ -58,6 +58,14 @@ describe EventSource::Entity do
             @client.attributes[:first_name].should == name
         end
     end
+
+    describe 'when reading attributes' do
+        it 'should return the right value' do
+            name = 'account1'
+            @acct.set(:name) {name}
+            @acct.get(:name).should == name
+        end
+    end
 end
 
 

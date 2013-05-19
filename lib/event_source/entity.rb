@@ -22,6 +22,10 @@ module EventSource
             @attributes[attr_name.to_sym] = block.call
         end
 
+        def get(attr_name)
+            @attributes[attr_name.to_sym]
+        end
+
         private
 
         def initialize
