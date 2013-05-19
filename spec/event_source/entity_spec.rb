@@ -28,6 +28,10 @@ describe EventSource::Entity do
         it 'should create the method with all require arguments' do
             @acct.deposit(1, 2).should == '12'
         end
+
+        it 'should create an event and add it to the list of entity events' do
+            raise NotImplemented
+        end
     end
 
     describe 'when calling event methods' do
