@@ -6,7 +6,7 @@ describe EventSource::Entity do
             extend EventSource::Entity::ClassMethods
             include EventSource::Entity
 
-            on_event :deposit do |e, arg1, arg2|
+            on_event :do_something do |e, arg1, arg2|
                 "#{arg1}#{arg2}"
             end
         end
@@ -22,15 +22,20 @@ describe EventSource::Entity do
 
     describe 'when registering events' do
         it 'should create a method with the same name as the event' do
-            @acct.methods.should include(:deposit)
+            @acct.methods.should include(:do_something)
         end
 
         it 'should create the method with all require arguments' do
-            @acct.deposit(1, 2).should == '12'
+            @acct.do_something(1, 2).should == '12'
         end
 
         it 'should create an event and add it to the list of entity events' do
-            raise NotImplemented
+            @acct.do_something(1, 2)
+
+            event = @acct.entity_events[0]
+            event.name.should == 'do_something'
+            event.entity_id.should == @acct.uid
+            event.data.should == @acct.entity_changes.to_json
         end
     end
 

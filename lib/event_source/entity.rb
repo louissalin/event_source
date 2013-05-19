@@ -10,7 +10,10 @@ module EventSource
 
             def on_event(name, &block)
                 self.define_method(name) do |*args| 
-                    block.call(args.unshift(self))
+                    returnValue = block.call(args.unshift(self))
+                    entity_events << EventSource::Event.new(name, self)
+
+                    returnValue
                 end
             end
         end
@@ -22,6 +25,11 @@ module EventSource
             val = block.call
             @entity_changes[attr_name.to_sym] = val
             self.send("#{attr_name}=", val)
+        end
+
+        def entity_events
+            @events ||= Array.new
+            @events
         end
 
         private
