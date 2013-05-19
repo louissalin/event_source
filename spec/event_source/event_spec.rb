@@ -14,7 +14,11 @@ describe EventSource::Event do
                 end
             end
 
+            @now = Time.now
             @event_name = 'event1'
+
+            Time.stub!(:now).and_return(@now)
+
             @acct = Account.create
             @event = EventSource::Event.new('event1', @acct)
         end
@@ -29,6 +33,10 @@ describe EventSource::Event do
 
         it 'should store the name of the event' do
             @event.name.should == @event_name
+        end
+
+        it 'should store the time the event was created at' do
+            @event.created_at.should == @now
         end
     end
 end
