@@ -3,9 +3,10 @@ require 'spec_helper'
 describe EventSource::Entity do
     before :each do
         class Account
+            extend EventSource::Entity::ClassMethods
             include EventSource::Entity
 
-            on_event :deposit do |arg1, arg2|
+            on_event :deposit do |e, arg1, arg2|
                 "#{arg1}#{arg2}"
             end
         end
@@ -30,18 +31,31 @@ describe EventSource::Entity do
     end
 
     describe 'when calling event methods' do
-        it 'should start a recording of state changes' do
+        before :each do
             class Client
+                extend EventSource::Entity::ClassMethods
                 include EventSource::Entity
 
                 on_event :noop do 
                 end
+
+                on_event :change_first_name do |e, name|
+                    e.set(:first_name) {name}
+                end
             end
 
             @client = Client.create
-            @client.noop
+        end
 
+        it 'should start a recording of state changes' do
+            @client.noop
             @client.attributes.keys.should be_empty
+        end
+
+        it 'should update attribute xxx when calling set(:xxx)' do
+            name = 'Louis'
+            @client.change_first_name name
+            @client.attributes[:first_name].should == name
         end
     end
 end
@@ -54,11 +68,10 @@ end
 #
 #   attributes :balance #, ...
 #
-#   on_event :deposit do |amount|
-#     new_balance = amount + @balance
+#   on_event :deposit do |e, amount|
 #     # do some validation
 #
-#     set_balance new_balance
+#     e.set (:balance) {amount + @balance}
 #   end
 # end
 #

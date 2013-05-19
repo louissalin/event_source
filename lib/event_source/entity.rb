@@ -1,16 +1,8 @@
 module EventSource
     module Entity
-        attr_reader :uid,
-                    :attributes
-
-        def self.included(base)
-            base.extend(ClassMethods)
-        end
-
         module ClassMethods
             def create
                 entity = self.new
-                entity.set_uid EventSource::UIDGenerator.generate_id
 
                 yield entity if block_given?
                 entity
@@ -18,18 +10,22 @@ module EventSource
 
             def on_event(name, &block)
                 self.define_method(name) do |*args| 
-                    block.call(args)
+                    block.call(args.unshift(self))
                 end
             end
         end
 
-        def set_uid(uid)
-            @uid = uid
+        attr_reader :uid,
+                    :attributes
+
+        def set(attr_name, &block)
+            @attributes[attr_name.to_sym] = block.call
         end
 
         private
 
         def initialize
+            @uid = EventSource::UIDGenerator.generate_id
             @attributes = Hash.new
         end
     end
