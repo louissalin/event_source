@@ -1,0 +1,6 @@
+updating domain:
+    Google protocol-buffers for serializing messages. Allows for free renaming of event fields
+    Use EventUpdater classes to filter event stream. They can upgrade, split, merge events
+
+Events
+    should have a time value of when they were created
