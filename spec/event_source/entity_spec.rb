@@ -74,6 +74,13 @@ describe EventSource::Entity do
             @client.change_first_name name
             @client.first_name.should == name
         end
+
+        it 'should add the entity to the entity repository' do
+            EventSource::EntityRepository.transaction do
+                @client.change_first_name 'whatever'
+                EventSource::EntityRepository.current.entities.should include(@client)
+            end
+        end
     end
 end
 
@@ -85,10 +92,10 @@ end
 #
 #   attributes :balance #, ...
 #
-#   on_event :deposit do |e, amount|
+#   on_event :deposit do |entity, amount|
 #     # do some validation
 #
-#     e.set (:balance) {amount + @balance}
+#     entity.set (:balance) {amount + @balance}
 #   end
 # end
 #

@@ -13,6 +13,11 @@ module EventSource
                     returnValue = block.call(args.unshift(self))
                     entity_events << EventSource::Event.new(name, self)
 
+                    # if repo is nil, that's because this isn't being executed in the context of a
+                    # transaction and the result won't be saved
+                    repo = EventSource::EntityRepository.current
+                    repo.entities << self if repo
+
                     returnValue
                 end
             end

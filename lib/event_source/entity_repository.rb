@@ -7,6 +7,8 @@ module EventSource
         attr_reader :entities
 
         class << self
+            @@current = nil
+
             def transaction
                 @@current = self.new
                 yield
