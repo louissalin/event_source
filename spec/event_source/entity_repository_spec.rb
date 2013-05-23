@@ -26,8 +26,27 @@ describe EventSource::EntityRepository do
 
             EventSource::EntityRepository.current.should be_nil
         end
+
+        it 'should commit the repository after the transaction is successful' do
+            entity = double('entity')
+            entity.should_receive(:save)
+
+            EventSource::EntityRepository.transaction do 
+                EventSource::EntityRepository.current.add(entity)
+            end
+        end
     end
 
-    describe 'when committing the repository'
+    describe 'when committing the repository' do
+        it 'should save each entity in the list' do
+            entity = double('entity')
+            sut = EventSource::EntityRepository.new
+            sut.add(entity)
+
+            entity.should_receive(:save)
+            sut.commit
+        end
+    end
+
     describe 'when searching for an entity'
 end

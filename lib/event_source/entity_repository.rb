@@ -12,6 +12,7 @@ module EventSource
             def transaction
                 @@current = self.new
                 yield
+                @@current.commit
                 @@current = nil
             end
 
@@ -26,6 +27,10 @@ module EventSource
 
         def add(entity)
             @entities << entity
+        end
+
+        def commit
+            @entities.each {|e| e.save}
         end
     end
 end

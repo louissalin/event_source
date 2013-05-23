@@ -37,6 +37,9 @@ module EventSource
             @events
         end
 
+        def save
+        end
+
         private
 
         def initialize
