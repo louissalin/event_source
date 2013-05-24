@@ -1,3 +1,5 @@
+require 'sequel'
+
 module EventSource
     class EventRepository
         class << self
