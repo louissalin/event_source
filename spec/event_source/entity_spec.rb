@@ -11,6 +11,21 @@ describe EventSource::Entity do
             end
         end
 
+        class Client
+            extend EventSource::Entity::ClassMethods
+            include EventSource::Entity
+
+            attr_accessor :first_name
+
+            on_event :noop do 
+            end
+
+            on_event :change_first_name do |e, name|
+                e.set(:first_name) {name}
+            end
+        end
+
+        @client = Client.create
         @acct = Account.create
     end
 
@@ -40,23 +55,6 @@ describe EventSource::Entity do
     end
 
     describe 'when calling event methods' do
-        before :each do
-            class Client
-                extend EventSource::Entity::ClassMethods
-                include EventSource::Entity
-
-                attr_accessor :first_name
-
-                on_event :noop do 
-                end
-
-                on_event :change_first_name do |e, name|
-                    e.set(:first_name) {name}
-                end
-            end
-
-            @client = Client.create
-        end
 
         it 'should start a recording of state changes' do
             @client.noop
@@ -80,6 +78,14 @@ describe EventSource::Entity do
                 @client.change_first_name 'whatever'
                 EventSource::EntityRepository.current.entities.should include(@client)
             end
+        end
+    end
+
+    describe 'when saving an entity' do
+        it 'should save the changed events on the entity' do
+            @client.change_first_name 'whatever'
+            @client.entity_events[0].should_receive(:save)
+            @client.save
         end
     end
 end

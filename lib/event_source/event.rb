@@ -10,5 +10,9 @@ module EventSource
             @data = entity.entity_changes.to_json
             @created_at = Time.now
         end
+
+        def save
+            EventSource::EventRepository.current.save(self)
+        end
     end
 end

@@ -38,6 +38,7 @@ module EventSource
         end
 
         def save
+            entity_events.each {|e| e.save}
         end
 
         private
