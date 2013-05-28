@@ -74,6 +74,11 @@ describe EventSource::Entity do
         end
 
         it 'should add the entity to the entity repository' do
+            repo = double('event_repo')
+            repo.stub!(:save)
+
+            EventSource::EventRepository.stub!(:current).and_return(repo)
+
             EventSource::EntityRepository.transaction do
                 @client.change_first_name 'whatever'
                 EventSource::EntityRepository.current.entities.should include(@client)
