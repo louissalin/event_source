@@ -1,9 +1,11 @@
 require 'spec_helper'
 
 describe EventSource::EntityRepository do
+
+    let(:entity) {double('entity')}
+
     describe 'when adding entities to the repository' do
         it 'should add them to the list' do
-            entity = double('entity')
             sut = EventSource::EntityRepository.new
             sut.add(entity)
 
@@ -28,7 +30,6 @@ describe EventSource::EntityRepository do
         end
 
         it 'should commit the repository after the transaction is successful' do
-            entity = double('entity')
             entity.should_receive(:save)
 
             EventSource::EntityRepository.transaction do 
@@ -39,7 +40,6 @@ describe EventSource::EntityRepository do
 
     describe 'when committing the repository' do
         it 'should save each entity in the list' do
-            entity = double('entity')
             sut = EventSource::EntityRepository.new
             sut.add(entity)
 
@@ -48,5 +48,35 @@ describe EventSource::EntityRepository do
         end
     end
 
-    describe 'when searching for an entity'
+    describe 'when searching for an entity' do
+        it 'should return a pre loaded entity if possible' do
+            uid = '123'
+            entity.stub!(:uid).and_return(uid)
+
+            sut = EventSource::EntityRepository.new
+            sut.add(entity)
+            
+            loaded_entity = sut.find(:entity, uid)
+            loaded_entity.object_id.should == entity.object_id
+        end
+
+        it 'should rebuild an entity with its events if there is no pre loaded entities' do
+            uid = '123'
+            name = 'new name'
+
+            class Client
+            end
+
+            event = double('event', name: 'name', entity_id: uid,
+                                    data: '{}', create_at: Time.now)
+
+            events = [event]
+            event_repo = double('event_repo', get_events: events)
+
+            sut = EventSource::EntityRepository.new(event_repo)
+
+            Client.should_receive(:rebuild).with(events)
+            loaded_entity = sut.find(:client, uid)
+        end
+    end
 end

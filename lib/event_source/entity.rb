@@ -8,6 +8,9 @@ module EventSource
                 entity
             end
 
+            def rebuild(events)
+            end
+
             def on_event(name, &block)
                 self.send(:define_method, name) do |*args|
                     returnValue = block.call(args.unshift(self))

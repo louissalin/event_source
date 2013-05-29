@@ -93,6 +93,10 @@ describe EventSource::Entity do
             @client.save
         end
     end
+
+    describe 'when rebuilding an entity' do
+        it 'should replay events and update the state'
+    end
 end
 
 
