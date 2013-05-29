@@ -2,6 +2,8 @@
 # every transaction done (anything from newing up the repo to commiting it) to 
 # create their own repo. That way, changes aren't shared.
 
+require 'set'
+
 module EventSource
     class EntityRepository
         attr_reader :entities
@@ -30,6 +32,7 @@ module EventSource
         end
 
         def commit
+            # TODO: gather all events of all entities, maintain order and save in batch
             @entities.each {|e| e.save}
         end
     end

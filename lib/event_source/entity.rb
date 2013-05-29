@@ -9,7 +9,7 @@ module EventSource
             end
 
             def on_event(name, &block)
-                self.define_method(name) do |*args| 
+                self.send(:define_method, name) do |*args|
                     returnValue = block.call(args.unshift(self))
                     entity_events << EventSource::Event.new(name, self)
 

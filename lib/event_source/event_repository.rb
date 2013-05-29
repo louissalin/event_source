@@ -2,6 +2,8 @@ require 'sequel'
 
 module EventSource
     class EventRepository
+        attr_reader :db
+
         class << self
             def current
                 @@instance ||= self.new(in_memory: true)
@@ -12,17 +14,9 @@ module EventSource
             end
         end
 
-        def save(events)
+        def save(event)
             sql = 'insert into events (name, entity_id, data, created_at) values ('
-
-            first = true
-            events.each do |e|
-                sql += ', ' unless first
-                sql += "\n#{e.name}, #{e.entity_id}, #{e.data}, #{e.created_at}"
-                first = false
-            end
-
-            puts '*****', sql
+            sql += "\n'#{event.name}', '#{event.entity_id}', '#{event.data}', '#{event.created_at}')"
 
             @db.run(sql)
         end

@@ -18,3 +18,7 @@ client = Client.create
 EventSource::EntityRepository.transaction do
     client.change_name('new name')
 end
+
+EventSource::EventRepository.current.db['select * from events'].each do |row|
+    puts row
+end
