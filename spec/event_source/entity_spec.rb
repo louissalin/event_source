@@ -15,13 +15,17 @@ describe EventSource::Entity do
             extend EventSource::Entity::ClassMethods
             include EventSource::Entity
 
-            attr_accessor :first_name
+            attr_accessor :first_name, :last_name
 
             on_event :noop do 
             end
 
             on_event :change_first_name do |e, name|
                 e.set(:first_name) {name}
+            end
+
+            on_event :change_last_name do |e, name|
+                e.set(:last_name) {name}
             end
         end
 
@@ -32,6 +36,11 @@ describe EventSource::Entity do
     describe 'when creating a new entity' do
         it 'should add a unique id to the entity' do 
             @acct.uid.should_not be_nil
+        end
+
+        it 'should use the passed in UID' do
+            acct = Account.create('666')
+            acct.uid.should == '666'
         end
     end
 
@@ -95,7 +104,18 @@ describe EventSource::Entity do
     end
 
     describe 'when rebuilding an entity' do
-        it 'should replay events and update the state'
+        it 'should replay events and update the state' do
+            @client.change_first_name 'whatever'
+            @client.change_first_name 'Louis'
+            @client.change_last_name 'Salin'
+            events = @client.entity_events
+
+            loaded_client = Client.rebuild(events)
+            loaded_client.first_name.should == @client.first_name
+            loaded_client.last_name.should == @client.last_name
+        end
+
+        it 'should build an empty entity when there are no events'
     end
 end
 

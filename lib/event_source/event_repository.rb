@@ -21,6 +21,10 @@ module EventSource
             @db.run(sql)
         end
 
+        def get_events(uid)
+            []
+        end
+
         private
 
         def initialize(options)

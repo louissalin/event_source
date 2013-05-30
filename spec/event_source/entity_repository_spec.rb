@@ -49,8 +49,9 @@ describe EventSource::EntityRepository do
     end
 
     describe 'when searching for an entity' do
+        let(:uid) {'123'}
+
         it 'should return a pre loaded entity if possible' do
-            uid = '123'
             entity.stub!(:uid).and_return(uid)
 
             sut = EventSource::EntityRepository.new
@@ -61,7 +62,6 @@ describe EventSource::EntityRepository do
         end
 
         it 'should rebuild an entity with its events if there is no pre loaded entities' do
-            uid = '123'
             name = 'new name'
 
             class Client
@@ -77,6 +77,17 @@ describe EventSource::EntityRepository do
 
             Client.should_receive(:rebuild).with(events)
             loaded_entity = sut.find(:client, uid)
+        end
+
+        it 'should create a new entity when there are no events to replay' do
+            class Client
+            end
+
+            event_repo = double('event_repo', get_events: [])
+            sut = EventSource::EntityRepository.new(event_repo)
+
+            Client.should_receive(:create).with(uid)
+            sut.find(:client, uid)
         end
     end
 end

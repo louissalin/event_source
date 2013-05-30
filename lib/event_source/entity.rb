@@ -1,14 +1,25 @@
 module EventSource
     module Entity
         module ClassMethods
-            def create
+            def create(uid = EventSource::UIDGenerator.generate_id)
                 entity = self.new
+                entity.send(:uid=, uid)
 
                 yield entity if block_given?
                 entity
             end
 
             def rebuild(events)
+                entity = self.new
+
+                events.each do |e|
+                    data = JSON.parse(e.data)
+                    data.keys.each do |attr|
+                        entity.send("#{attr}=", data[attr])
+                    end
+                end
+
+                entity
             end
 
             def on_event(name, &block)
@@ -47,8 +58,11 @@ module EventSource
         private
 
         def initialize
-            @uid = EventSource::UIDGenerator.generate_id
             @entity_changes = Hash.new
+        end
+
+        def uid=(new_uid)
+            @uid = new_uid
         end
     end
 end

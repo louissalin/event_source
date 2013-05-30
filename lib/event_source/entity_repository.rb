@@ -43,7 +43,15 @@ module EventSource
             return entity if entity
 
             events = @event_repo.get_events(uid)
-            entity = type.to_s.camelize.constantize.rebuild(events)
+
+            entity_class = type.to_s.camelize.constantize
+            if events.count > 0
+                entity = entity_class.rebuild(events)
+            else
+                entity = entity_class.create(uid)
+            end
+
+            entity
         end
     end
 end
