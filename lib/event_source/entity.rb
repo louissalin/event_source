@@ -27,7 +27,7 @@ module EventSource
             def on_event(name, &block)
                 self.send(:define_method, name) do |*args|
                     returnValue = block.call(args.unshift(self))
-                    entity_events << EventSource::Event.new(name, self)
+                    entity_events << EventSource::Event.create(name, self)
 
                     # if repo is nil, that's because this isn't being executed in the context of a
                     # transaction and the result won't be saved

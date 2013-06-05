@@ -19,7 +19,7 @@ describe EventSource::Event do
         Time.stub!(:now).and_return(@now)
 
         @acct = Account.create
-        @event = EventSource::Event.new('event1', @acct)
+        @event = EventSource::Event.create('event1', @acct)
     end
 
     describe 'when creating an event' do

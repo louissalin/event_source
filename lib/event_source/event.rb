@@ -5,16 +5,44 @@ module EventSource
     class Event
         attr_reader :name, :entity_type, :entity_id, :data, :created_at
 
-        def initialize(name, entity)
+        class << self
+            def build_from_data(data)
+                event = self.new
+                event.send(:new_from_data, data)
+                event
+            end
+
+            def create(name, entity)
+                event = self.new
+                event.send(:new_from_entity, name, entity)
+                event
+            end
+        end
+
+        def save
+            EventSource::EventRepository.current.save(self) if @can_save
+        end
+
+        private
+
+        def new_from_entity(name, entity)
             @name = name.to_s
             @entity_id = entity.uid
             @data = entity.entity_changes.to_json
             @created_at = Time.now
             @entity_type = entity.class.to_s.underscore
+
+            @can_save = true
         end
 
-        def save
-            EventSource::EventRepository.current.save(self)
+        def new_from_data(data)
+            @name = data[:name]
+            @entity_id = data[:entity_id]
+            @data = data[:data]
+            @created_at = data[:created_at]
+            @entity_type = data[:entity_type]
+
+            @can_save = false
         end
     end
 end

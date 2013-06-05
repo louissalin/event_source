@@ -24,7 +24,8 @@ module EventSource
         end
 
         def get_events(type, uid)
-            []
+            data = @db[:events].where(entity_type: type, entity_id: uid).order(:created_at)
+            data.map {|d| create_event(d)}
         end
 
         private
@@ -45,6 +46,10 @@ module EventSource
                 Time :created_at
                 String :data
             end
+        end
+
+        def create_event(data)
+            EventSource::Event.build_from_data(data)
         end
     end
 end
