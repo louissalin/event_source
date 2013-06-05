@@ -1,3 +1,4 @@
+require './lib/event_source/exceptions'
 require './lib/event_source/uid_generator'
 require './lib/event_source/event'
 require './lib/event_source/entity'

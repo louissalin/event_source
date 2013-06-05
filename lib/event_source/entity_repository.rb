@@ -42,7 +42,7 @@ module EventSource
             entity = @entities.select {|e| e.uid == uid}[0]
             return entity if entity
 
-            events = @event_repo.get_events(uid)
+            events = @event_repo.get_events(type, uid)
 
             entity_class = type.to_s.camelize.constantize
             if events.count > 0

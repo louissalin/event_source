@@ -1,0 +1,1 @@
+class InvalidEntityID < Exception; end

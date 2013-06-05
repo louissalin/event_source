@@ -15,10 +15,12 @@ module EventSource
         end
 
         def save(event)
-            sql = 'insert into events (name, entity_type, entity_id, data, created_at) values ('
-            sql += "\n'#{event.name}', '#{event.entity_type}', '#{event.entity_id}', '#{event.data}', '#{event.created_at}')"
+            count = @db[:events].where(entity_type: event.entity_type, entity_id: event.entity_id).count
 
-            @db.run(sql)
+            raise InvalidEntityID if count > 0
+            @db[:events].insert(name: event.name, entity_type: event.entity_type,
+                                entity_id: event.entity_id, data: event.data,
+                                created_at: event.created_at)
         end
 
         def get_events(type, uid)
