@@ -15,7 +15,8 @@ module EventSource
         end
 
         def save(event)
-            count = @db[:events].where(entity_type: event.entity_type, entity_id: event.entity_id).count
+            count = @db[:events].exclude_where(entity_type: event.entity_type).
+                                 where(entity_id: event.entity_id).count
 
             raise InvalidEntityID if count > 0
             @db[:events].insert(name: event.name, entity_type: event.entity_type,
@@ -24,7 +25,7 @@ module EventSource
         end
 
         def get_events(type, uid)
-            data = @db[:events].where(entity_type: type, entity_id: uid).order(:created_at)
+            data = @db[:events].where(entity_type: type.to_s, entity_id: uid).order(:created_at)
             data.map {|d| create_event(d)}
         end
 

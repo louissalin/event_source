@@ -14,11 +14,29 @@ class Client
 end
 
 client = Client.create
+uid = client.uid
 
 EventSource::EntityRepository.transaction do
     client.change_name('new name')
 end
 
-EventSource::EventRepository.current.db['select * from events'].each do |row|
+event_repo = EventSource::EventRepository.current
+puts 'Events in the database:'
+event_repo.db['select * from events'].each do |row|
     puts row
 end
+
+entity_repo = EventSource::EntityRepository.new(event_repo)
+entity = entity_repo.find(:client, uid)
+
+puts 'loaded entity:'
+puts entity.inspect
+
+EventSource::EntityRepository.transaction do
+    client.change_name('Some other new name')
+end
+
+entity = entity_repo.find(:client, uid)
+
+puts 'loaded entity:'
+puts entity.inspect

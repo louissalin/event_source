@@ -15,7 +15,9 @@ describe EventSource::EventRepository do
         @db.stub(:[]).and_return(@table)
 
         @result = mock('query_result')
-        @table.stub(:where).with(entity_type: 'account', entity_id: 'abc').and_return(@result)
+        where = double('where')
+        where.stub(:where).with(entity_id: 'abc').and_return(@result)
+        @table.stub(:exclude_where).with(entity_type: 'account').and_return(where)
 
         @sut = EventSource::EventRepository.create(in_memory: true)
     end
