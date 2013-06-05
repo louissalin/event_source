@@ -10,6 +10,8 @@ module EventSource
             end
 
             def rebuild(events)
+                return self.create() if events.length == 0
+
                 entity = self.new
 
                 events.each do |e|

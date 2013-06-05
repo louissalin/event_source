@@ -115,7 +115,10 @@ describe EventSource::Entity do
             loaded_client.last_name.should == @client.last_name
         end
 
-        it 'should build an empty entity when there are no events'
+        it 'should build an empty entity when there are no events' do
+            Client.should_receive(:create)
+            empty_client = Client.rebuild([])
+        end
     end
 end
 
