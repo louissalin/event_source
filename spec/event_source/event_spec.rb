@@ -51,5 +51,13 @@ describe EventSource::Event do
             repo.should_receive(:save).with(@event)
             @event.save
         end
+
+        it 'should raise an error if the event was recreated from data' do
+            data = {name: 'event', entity_id: 'abc', entity_type: 'account', 
+                    created_at: Time.now, data: {}}
+
+            event = EventSource::Event.build_from_data(data)
+            expect {event.save}.to raise_error(CannotSaveRebuiltEvent)
+        end
     end
 end

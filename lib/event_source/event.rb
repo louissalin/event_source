@@ -20,7 +20,8 @@ module EventSource
         end
 
         def save
-            EventSource::EventRepository.current.save(self) if @can_save
+            raise CannotSaveRebuiltEvent if @is_rebuilt
+            EventSource::EventRepository.current.save(self)
         end
 
         private
@@ -32,7 +33,7 @@ module EventSource
             @created_at = Time.now
             @entity_type = entity.class.to_s.underscore
 
-            @can_save = true
+            @is_rebuilt = false
         end
 
         def new_from_data(data)
@@ -42,7 +43,7 @@ module EventSource
             @created_at = data[:created_at]
             @entity_type = data[:entity_type]
 
-            @can_save = false
+            @is_rebuilt = true
         end
     end
 end
