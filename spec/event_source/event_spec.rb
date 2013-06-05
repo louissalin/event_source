@@ -38,6 +38,10 @@ describe EventSource::Event do
         it 'should store the time the event was created at' do
             @event.created_at.should == @now
         end
+
+        it 'should store the entity type' do
+            @event.entity_type.should == 'account'
+        end
     end
 
     describe 'when saving an event' do
