@@ -16,6 +16,9 @@ Gem::Specification.new do |s|
     s.description   = 'Event sourcing allows you to persist changes to your domain instead of the state of your domain'
 
     s.add_development_dependency 'rspec'
+    s.add_runtime_dependency 'uuidtools'
+    s.add_runtime_dependency 'sequel'
+    s.add_runtime_dependency 'activesupport'
 
     s.files         = Dir.glob("lib/**/*") + %w(LICENSE README.md CHANGELOG.md)
     s.require_path  = 'lib'
