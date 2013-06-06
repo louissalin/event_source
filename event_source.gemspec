@@ -5,7 +5,7 @@ $:.unshift lib unless $:.include?(lib)
 require 'event_source/version'
 
 Gem::Specification.new do |s|
-    s.name          = 'command_bus'
+    s.name          = 'event_source'
     s.version       = EventSource::Version
     s.platform      = Gem::Platform::RUBY
     s.authors       = ['Louis Salin']
