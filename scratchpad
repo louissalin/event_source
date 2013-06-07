@@ -1,7 +1,10 @@
+improvements:
+    entity repository. Newing it up just to load an entity is kinda weird.
+    add message queue and publish messages when events are triggered
+
 updating domain:
     Google protocol-buffers for serializing messages. Allows for free renaming of event fields
     Use EventUpdater classes to filter event stream. They can upgrade, split, merge events
-    Add entity type to event class so we can check for existing uids and blow up if we're trying to update an entity of a different type than one that's stored already with the same uid.
 
 optimizations:
     insert all events in one go when saving multiple events instead of inserting them in the db one at a time
