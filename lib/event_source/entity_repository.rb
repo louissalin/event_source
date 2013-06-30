@@ -7,26 +7,25 @@ require 'active_support/inflector'
 
 module EventSource
     class EntityRepository
+        extend EventSource::MemoizeInstance
+
         attr_reader :entities
 
         class << self
-            @@current = nil
-
             def transaction
-                @@current = self.new
+                self.current.clear
                 yield
-                @@current.commit
-                @@current = nil
-            end
-
-            def current
-                @@current
+                self.current.commit
             end
         end
 
         def initialize(event_repo = nil)
             @entities = Set.new
             @event_repo = event_repo
+        end
+
+        def clear
+            @entities.clear
         end
 
         def add(entity)
@@ -36,6 +35,7 @@ module EventSource
         def commit
             # TODO: gather all events of all entities, maintain order and save in batch
             @entities.each {|e| e.save}
+            clear
         end
 
         def find(type, uid)
@@ -52,6 +52,12 @@ module EventSource
             end
 
             entity
+        end
+
+        private
+
+        def self.default_args
+            [EventSource::EventRepository.current]
         end
     end
 end

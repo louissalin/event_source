@@ -26,7 +26,7 @@ event_repo.db['select * from events'].each do |row|
     puts row
 end
 
-entity_repo = EventSource::EntityRepository.new(event_repo)
+entity_repo = EventSource::EntityRepository.current
 entity = entity_repo.find(:client, uid)
 
 puts 'loaded entity:'

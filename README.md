@@ -10,6 +10,12 @@ An event store must be initialized. Currently, only the in_memory SQLlite3 type 
 EventSource::EventRepository.create(in_memory: true)
 ```
 
+Once initialized, the event repository is memoized and can be retrieved with:
+
+```ruby
+EventSource::EventRepository.current
+```
+
 ## Your entities
 
 An entity is an object that you intend to persist. You must extend and include some class methods and instance methods. Let's create an entity called BankAccount.
@@ -77,6 +83,8 @@ account = BankAccount.create
 
 This repository is used to store and load entities. It is also used to monitor changes to entities. When a transaction is created, all changes to all entities and all events created will be saved in the event repository.
 
+The entity repository needs an instance of an event repository to work. If you decide to create your own instance of the entity repository, be sure to pass one as a parameter to the initialize method. Thankfully, however, since the event repository is memoize, the entity repository will simply call use it if you don't specify your own.
+
 ### Transactions
 
 ```ruby
@@ -93,9 +101,25 @@ To load an entity, you must create an entity repository and pass it an instance 
 
 The 'find' method expects an entity type and the entity's unique identifier. The type, by convention, is simply a lowercase undescored string of the entity class name.
 
+The following will use the default event and entity repositories. No need to create your own:
+
 ```ruby
-event_repo = EventSource::EventRepository.current
-entity_repo = EventSource::EntityRepository.new(event_repo)
+entity_repo = EventSource::EntityRepository.current
 entity = entity_repo.find(:bank_account, uid)
 ```
 
+Since the entity repository will automatically grab a memoize event repository, simply creating one ahead of time will ensure that it is picked up by the entity repository:
+
+```ruby
+event_repo = EventSource::EventRepository.create(:in_memory => true)
+entity_repo = EventSource::EntityRepository.current
+entity = entity_repo.find(:bank_account, uid)
+```
+
+Alternatively, you can instantiate everything yourself
+
+```ruby
+event_repo = EventSource::EventRepository.create(:in_memory => true)
+entity_repo = EventSource::EntityRepository.new(event_repo)
+entity = entity_repo.find(:bank_account, uid)
+```

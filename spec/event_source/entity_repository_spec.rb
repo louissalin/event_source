@@ -22,18 +22,21 @@ describe EventSource::EntityRepository do
             end
         end
 
-        it 'should not make the repo available outside the transaction block' do
-            EventSource::EntityRepository.transaction do 
-            end
-
-            EventSource::EntityRepository.current.should be_nil
-        end
-
         it 'should commit the repository after the transaction is successful' do
             entity.should_receive(:save)
 
             EventSource::EntityRepository.transaction do 
                 EventSource::EntityRepository.current.add(entity)
+            end
+        end
+
+        it 'should empty entities list before starting the new transaction' do
+            sut = EventSource::EntityRepository.current
+            sut.add(entity)
+            sut.entities.count.should == 1
+
+            EventSource::EntityRepository.transaction do 
+                EventSource::EntityRepository.current.entities.count.should == 0
             end
         end
     end
@@ -45,6 +48,15 @@ describe EventSource::EntityRepository do
 
             entity.should_receive(:save)
             sut.commit
+        end
+
+        it 'should empty the entities after a commit' do
+            sut = EventSource::EntityRepository.new
+            sut.add(entity)
+
+            entity.stub!(:save)
+            sut.commit
+            sut.entities.count.should == 0
         end
     end
 

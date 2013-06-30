@@ -2,15 +2,13 @@ require 'sequel'
 
 module EventSource
     class EventRepository
+        extend EventSource::MemoizeInstance
+
         attr_reader :db
 
         class << self
-            def current
-                @@instance ||= self.new(in_memory: true)
-            end
-
             def create(options)
-                @@instance = self.new(options)
+                @instance = self.new(options)
             end
         end
 
@@ -30,6 +28,10 @@ module EventSource
         end
 
         private
+
+        def self.default_args
+            [in_memory: true]
+        end
 
         def initialize(options)
             if options[:in_memory] 
