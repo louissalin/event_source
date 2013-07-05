@@ -46,7 +46,7 @@ module EventSource
 
             entity_class = type.to_s.camelize.constantize
             if events.count > 0
-                entity = entity_class.rebuild(events)
+                entity = entity_class.rebuild(uid, events)
             else
                 entity = entity_class.create(uid)
             end

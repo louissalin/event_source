@@ -29,14 +29,15 @@ end
 entity_repo = EventSource::EntityRepository.current
 entity = entity_repo.find(:client, uid)
 
-puts 'loaded entity:'
-puts entity.inspect
+raise unless entity.uid == client.uid
+raise unless entity.name == client.name
+raise unless entity.name == 'new name'
 
 EventSource::EntityRepository.transaction do
-    client.change_name('Some other new name')
+    entity.change_name('Some other new name')
 end
 
 entity = entity_repo.find(:client, uid)
 
-puts 'loaded entity:'
-puts entity.inspect
+raise unless entity.name == 'Some other new name'
+puts 'all good!'

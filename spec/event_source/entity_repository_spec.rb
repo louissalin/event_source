@@ -87,7 +87,7 @@ describe EventSource::EntityRepository do
 
             sut = EventSource::EntityRepository.new(event_repo)
 
-            Client.should_receive(:rebuild).with(events)
+            Client.should_receive(:rebuild).with(uid, events)
             loaded_entity = sut.find(:client, uid)
         end
 

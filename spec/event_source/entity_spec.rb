@@ -110,14 +110,14 @@ describe EventSource::Entity do
             @client.change_last_name 'Salin'
             events = @client.entity_events
 
-            loaded_client = Client.rebuild(events)
+            loaded_client = Client.rebuild(@client.uid, events)
             loaded_client.first_name.should == @client.first_name
             loaded_client.last_name.should == @client.last_name
         end
 
         it 'should build an empty entity when there are no events' do
             Client.should_receive(:create)
-            empty_client = Client.rebuild([])
+            empty_client = Client.rebuild('123', [])
         end
     end
 end
