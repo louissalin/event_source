@@ -6,9 +6,10 @@ module EventSource
 
         attr_reader :db
 
-        class << self
-            def create(options)
-                @instance = self.new(options)
+        def initialize(options)
+            if options[:in_memory] 
+                @db = Sequel.sqlite
+                init_in_memory_schema
             end
         end
 
@@ -31,13 +32,6 @@ module EventSource
 
         def self.default_args
             [in_memory: true]
-        end
-
-        def initialize(options)
-            if options[:in_memory] 
-                @db = Sequel.sqlite
-                init_in_memory_schema
-            end
         end
 
         def init_in_memory_schema
