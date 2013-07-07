@@ -13,6 +13,10 @@ class Client
     end
 end
 
+class Account
+    attr_accessor :clients
+end
+
 class Client 
     extend EventSource::Entity::ClassMethods
     include EventSource::Entity
@@ -22,5 +26,26 @@ class Client
     end
 end
 
+class Account 
+    extend EventSource::Entity::ClassMethods
+    include EventSource::Entity
+
+    def on_initialized
+        @clients = []
+    end
+
+    on_event :add_client do |e, client|
+        new_list = e.clients + [client]
+        e.set(:clients) {new_list}
+    end
+end
+
 client = Client.create
 raise if client.uid.nil?
+
+account = Account.create
+account.add_client(client)
+
+raise unless account.clients[0].name == client.name
+
+puts 'all good!'

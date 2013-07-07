@@ -62,6 +62,9 @@ module EventSource
 
         def initialize
             @entity_changes = Hash.new
+            if defined? on_initialized
+                on_initialized
+            end
         end
 
         def uid=(new_uid)
