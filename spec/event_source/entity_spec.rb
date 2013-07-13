@@ -21,11 +21,11 @@ describe EventSource::Entity do
             end
 
             on_event :change_first_name do |e, name|
-                e.set(:first_name) {name}
+                e.first_name = name
             end
 
             on_event :change_last_name do |e, name|
-                e.set(:last_name) {name}
+                e.last_name = name
             end
         end
 
@@ -59,23 +59,11 @@ describe EventSource::Entity do
             event = @acct.entity_events[0]
             event.name.should == 'do_something'
             event.entity_id.should == @acct.uid
-            event.data.should == @acct.entity_changes.to_json
+            event.data.should == [1, 2].to_json
         end
     end
 
     describe 'when calling event methods' do
-
-        it 'should start a recording of state changes' do
-            @client.noop
-            @client.entity_changes.keys.should be_empty
-        end
-
-        it 'should add xxx to entity changes when calling set(:xxx)' do
-            name = 'Louis'
-            @client.change_first_name name
-            @client.entity_changes[:first_name].should == name
-        end
-
         it 'should set xxx when set(:xxx) is called' do
             name = 'Louis'
             @client.change_first_name name

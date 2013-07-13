@@ -10,25 +10,27 @@ module EventSource
             end
 
             def rebuild(uid, events)
+                @rebuilding = true
                 return self.create(uid) if events.length == 0
 
                 entity = self.new
                 entity.send(:uid=, uid)
 
                 events.each do |e|
-                    data = JSON.parse(e.data)
-                    data.keys.each do |attr|
-                        entity.send("#{attr}=", data[attr])
-                    end
+                    entity.send(e.name, *(e.get_args))
                 end
+                @rebuilding = false
 
                 entity
             end
 
             def on_event(name, &block)
                 self.send(:define_method, name) do |*args|
-                    returnValue = block.call(args.unshift(self))
-                    entity_events << EventSource::Event.create(name, self)
+                    block_args = [self] + args
+                    returnValue = block.call(block_args)
+                    return if @rebuilding
+
+                    entity_events << EventSource::Event.create(name, self, args)
 
                     # if repo is nil, that's because this isn't being executed in the context of a
                     # transaction and the result won't be saved
@@ -40,14 +42,7 @@ module EventSource
             end
         end
 
-        attr_reader :uid,
-                    :entity_changes
-
-        def set(attr_name, &block)
-            val = block.call
-            @entity_changes[attr_name.to_sym] = val
-            self.send("#{attr_name}=", val)
-        end
+        attr_reader :uid
 
         def entity_events
             @events ||= Array.new
@@ -61,7 +56,6 @@ module EventSource
         private
 
         def initialize
-            @entity_changes = Hash.new
             if defined? on_initialized
                 on_initialized
             end

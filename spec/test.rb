@@ -9,7 +9,7 @@ class Client
     attr_accessor :name
 
     on_event :change_name do |e, name|
-        e.set(:name) {name}
+        e.name = name
     end
 end
 

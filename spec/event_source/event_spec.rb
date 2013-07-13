@@ -19,7 +19,7 @@ describe EventSource::Event do
         Time.stub!(:now).and_return(@now)
 
         @acct = Account.create
-        @event = EventSource::Event.create('event1', @acct)
+        @event = EventSource::Event.create('event1', @acct, [1,2,3])
     end
 
     describe 'when creating an event' do
@@ -28,7 +28,7 @@ describe EventSource::Event do
         end
 
         it 'should serialize and store the entity\'s changes' do
-            @event.data.should == @acct.entity_changes.to_json
+            @event.data.should == [1,2,3].to_json
         end
 
         it 'should store the name of the event' do

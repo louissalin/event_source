@@ -22,7 +22,7 @@ class Client
     include EventSource::Entity
 
     on_event :change_name do |e, name|
-        e.set(:name) {name}
+        e.name = name
     end
 end
 
@@ -36,7 +36,7 @@ class Account
 
     on_event :add_client do |e, client|
         new_list = e.clients + [client]
-        e.set(:clients) {new_list}
+        e.clients = new_list
     end
 end
 

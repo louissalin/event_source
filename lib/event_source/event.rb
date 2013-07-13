@@ -12,11 +12,15 @@ module EventSource
                 event
             end
 
-            def create(name, entity)
+            def create(name, entity, args)
                 event = self.new
-                event.send(:new_from_entity, name, entity)
+                event.send(:new_from_entity, name, entity, args)
                 event
             end
+        end
+
+        def get_args
+            JSON.parse(data)
         end
 
         def save
@@ -26,10 +30,10 @@ module EventSource
 
         private
 
-        def new_from_entity(name, entity)
+        def new_from_entity(name, entity, args)
             @name = name.to_s
             @entity_id = entity.uid
-            @data = entity.entity_changes.to_json
+            @data = args.to_json
             @created_at = Time.now
             @entity_type = entity.class.to_s.underscore
 
