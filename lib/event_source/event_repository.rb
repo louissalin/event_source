@@ -11,6 +11,11 @@ module EventSource
                 @db = Sequel.sqlite
                 init_in_memory_schema
             end
+            
+            if options[:connect]
+                con = options[:sqlite][:connection_string]
+                @db = Sequel.connect(con)
+            end
         end
 
         def save(event)
