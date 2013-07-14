@@ -4,7 +4,7 @@ This library is an implementation of the Event Sourcing pattern, where instead o
 
 ## The event repository
 
-An event store must be initialized. Currently, only the in_memory SQLlite3 type is available.
+An event store must be initialized. Currently, only SQL based databases accessible via the Sequel gem can be used.
 
 ```ruby
 EventSource::EventRepository.create(in_memory: true)
@@ -15,6 +15,24 @@ Once initialized, the event repository is memoized and can be retrieved with:
 ```ruby
 EventSource::EventRepository.current
 ```
+
+### Connecting to an existing database
+Alternatively, you will probably need to connect to an existing database.
+
+```ruby
+EventSource::EventRepository.create(connect: {connection_string: 'sqlite://events.db'})
+```
+
+### Schema
+
+In the event you connect to an existing database, the EventRepository will expect the database to contain a table called "events" with the following schema:
+
+* primary key: id
+* string: name
+* string: entity_id
+* string: entity_type
+* time: created_at
+* string: data
 
 ## Your entities
 
