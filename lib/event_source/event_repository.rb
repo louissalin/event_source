@@ -13,7 +13,7 @@ module EventSource
             end
             
             if options[:connect]
-                con = options[:sqlite][:connection_string]
+                con = options[:connect][:connection_string]
                 @db = Sequel.connect(con)
             end
         end
