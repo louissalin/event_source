@@ -1,6 +1,6 @@
 improvements:
-    entity repository. Newing it up just to load an entity is kinda weird.
     add message queue and publish messages when events are triggered
+    add more storage options
 
 updating domain:
     Google protocol-buffers for serializing messages. Allows for free renaming of event fields
