@@ -1,4 +1,4 @@
-require './lib/event_source'
+require './spec/test_helper'
 
 EventSource::EventRepository.create(in_memory: true)
 

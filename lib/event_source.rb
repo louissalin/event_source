@@ -1,10 +1,10 @@
-require './lib/event_source/exceptions'
-require './lib/event_source/uid_generator'
-require './lib/event_source/event'
-require './lib/event_source/entity'
-require './lib/event_source/memoize_instance'
-require './lib/event_source/entity_repository'
-require './lib/event_source/event_repository'
+require 'event_source/exceptions'
+require 'event_source/uid_generator'
+require 'event_source/event'
+require 'event_source/entity'
+require 'event_source/memoize_instance'
+require 'event_source/entity_repository'
+require 'event_source/event_repository'
 
 module EventSource
 end
