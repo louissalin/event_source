@@ -4,6 +4,9 @@ GEM
     activesupport (3.2.13)
       i18n (= 0.6.1)
       multi_json (~> 1.0)
+    amq-protocol (1.7.0)
+    bunny (0.10.2)
+      amq-protocol (>= 1.6.0)
     diff-lcs (1.2.4)
     i18n (0.6.1)
     multi_json (1.7.4)
@@ -24,6 +27,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  bunny (>= 0.10.0)
   rspec
   sequel
   sqlite3

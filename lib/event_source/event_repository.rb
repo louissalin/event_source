@@ -26,6 +26,8 @@ module EventSource
             @db[:events].insert(name: event.name, entity_type: event.entity_type,
                                 entity_id: event.entity_id, data: event.data,
                                 created_at: event.created_at)
+
+            EventSource::Publisher.current.publish(event)
         end
 
         def get_events(type, uid)
