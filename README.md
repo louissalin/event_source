@@ -60,17 +60,15 @@ class BankAccount
 end
 ```
 
-Your event handler will receive at least one parameter, which is the instance of the entity being modified. It is used to set the state of your entity by calling the method 'set' on it. All the other parameters will be arguments that must be giving when calling the event. In this case, when calling the deposit event, the caller will have to supply the amount. 
+Your event handler will receive at least one parameter, which is the instance of the entity being modified. It is used to set the state of your entity by modifying attributes on it. All the other parameters will be arguments that must be giving when calling the event. In this case, when calling the deposit event, the caller will have to supply the amount. 
 
 Here's what could go into event handler:
 
 ```ruby
   on_event :deposit do |e, amount|
-    e.set(:balance) {@balance + amount}
+    e.balance = @balance + amount
   end
 ```
-
-The 'set' method does more than simply set the @balance attribute. It also saves the state of your entity into the event so that when the event eventually gets replayed to rebuild this entity, it will know how to set the balance of the account.
 
 To call the event, simply call the 'deposit' method that was created for you:
 
