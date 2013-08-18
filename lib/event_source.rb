@@ -5,6 +5,7 @@ require 'event_source/entity'
 require 'event_source/memoize_instance'
 require 'event_source/entity_repository'
 require 'event_source/event_repository'
+require 'event_source/publish/rabbitmq'
 
 module EventSource
 end
