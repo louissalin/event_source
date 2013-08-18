@@ -28,6 +28,16 @@ module EventSource
             EventSource::EventRepository.current.save(self)
         end
 
+        def to_json
+            {
+                name: @name,
+                entity_id: @entity_id,
+                data: @data,
+                created_at: @created_at,
+                entity_type: @entity_type
+            }.to_json
+        end
+
         private
 
         def new_from_entity(name, entity, args)
