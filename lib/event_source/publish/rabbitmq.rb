@@ -4,7 +4,7 @@ module EventSource
     class Publisher
         extend EventSource::MemoizeInstance
 
-        def initialize(options)
+        def initialize(options = {})
             @configured = false
 
             exchange_name = options[:exchange_name] || 'event_source.events'

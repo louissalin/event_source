@@ -79,6 +79,17 @@ account.deposit(100)
 
 Note that calling the event outside the context of a Entity Repository transaction won't persist the event. (see below)
 
+### publishing events
+
+Whenever an event is saved to the event repository, the event will also be published for external applications to respond to. To enable this, you will need to create an instance of EventSource::Publisher and pass it a started Bunny connection and an exchange name (optional. will default to 'event_source.events')
+
+```ruby
+conn = Bunny.new("amqp://guest:guest@localhost:5672")
+conn.start
+
+EventSource::Publisher.create(connection: conn, exchange_name: 'some_exchange')
+```
+
 ### unique identifiers
 
 Each entity gets a unique identifier when created the first time. This id is important. You will need it to recreate the entity. You can access it with the 'uid' attribute.

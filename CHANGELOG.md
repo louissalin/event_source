@@ -13,3 +13,6 @@ can specify a connection string to connect to an existing database
 
 ## version 0.1.5
 allow gem to be loaded
+
+## version 0.1.6
+pass in a Bunny connection to publish events to a rabbitmq broker
