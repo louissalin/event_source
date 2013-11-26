@@ -1,6 +1,11 @@
 improvements:
+  save events in batch, by entity_type so we don't query the entity's version when saving every event
     add message queue and publish messages when events are triggered
     add more storage options
+    rolling snapshots
+    use event store as a queue
+        add sequence_number to events table, auto-inc
+        create process that asynchronously polls the queue for new events (using sequence_number) and publishes them
 
 updating domain:
     Google protocol-buffers for serializing messages. Allows for free renaming of event fields

@@ -3,7 +3,7 @@ require 'json'
 
 module EventSource
     class Event
-        attr_reader :name, :entity_type, :entity_id, :data, :created_at
+        attr_reader :name, :entity_type, :entity_id, :data, :created_at, :version
 
         class << self
             def build_from_data(data)
@@ -34,7 +34,8 @@ module EventSource
                 entity_id: @entity_id,
                 data: @data,
                 created_at: @created_at,
-                entity_type: @entity_type
+                entity_type: @entity_type,
+                version: @version,
             }.to_json
         end
 
@@ -46,6 +47,7 @@ module EventSource
             @data = args.to_json
             @created_at = Time.now
             @entity_type = entity.class.to_s.underscore
+            @version = nil
 
             @is_rebuilt = false
         end
@@ -56,6 +58,7 @@ module EventSource
             @data = data[:data]
             @created_at = data[:created_at]
             @entity_type = data[:entity_type]
+            @version = data[:version]
 
             @is_rebuilt = true
         end
