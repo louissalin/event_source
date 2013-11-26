@@ -25,14 +25,21 @@ EventSource::EventRepository.create(connect: {connection_string: 'sqlite://event
 
 ### Schema
 
-In the event you connect to an existing database, the EventRepository will expect the database to contain a table called "events" with the following schema:
+In the event you connect to an existing database, the EventRepository will expect the database to contain two tables called "events" and "event_versions" with the following schemas:
 
+table: events
 * primary key: id
 * string: name
 * string: entity_id
 * string: entity_type
 * time: created_at
 * string: data
+* integer: version
+
+table: event_versions
+* string: entity_type
+* string: entity_id
+* integer: version
 
 ## Your entities
 
