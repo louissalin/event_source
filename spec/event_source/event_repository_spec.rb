@@ -84,7 +84,7 @@ describe EventSource::EventRepository do
       @table.stub(:where).with(entity_type: 'account', entity_id: 'abc').
         and_return(dataset)
 
-      dataset.should_receive(:order).with(:created_at).and_return([])
+      dataset.should_receive(:order).with(:version).and_return([])
       @sut.get_events('account', 'abc')
     end
 

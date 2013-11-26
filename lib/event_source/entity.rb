@@ -50,6 +50,7 @@ module EventSource
         end
 
         def save
+          #todo: somehow setup event_repo to query query version # for this entity just once before doing the each
             entity_events.each {|e| e.save}
         end
 

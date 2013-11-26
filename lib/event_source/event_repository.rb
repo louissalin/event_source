@@ -44,7 +44,7 @@ module EventSource
     end
 
     def get_events(type, uid)
-      data = @db[:events].where(entity_type: type.to_s, entity_id: uid).order(:created_at)
+      data = @db[:events].where(entity_type: type.to_s, entity_id: uid).order(:version)
       data.map {|d| create_event(d)}
     end
 
