@@ -18,29 +18,44 @@ module EventSource
       end
     end
 
-    def save(event)
-      count = @db[:events].exclude_where(entity_type: event.entity_type).
-        where(entity_id: event.entity_id).count
+    def save(events)
+      return true if events.count == 0
+      return false unless are_for_same_id_and_type(events)
+
+      ensure_are_not_rebuilt(events)
+
+      entity_type = events.first.entity_type
+      entity_id = events.first.entity_id
+
+      count = @db[:events].exclude_where(entity_type: entity_type)
+      .where(entity_id: entity_id).count
 
       raise InvalidEntityID if count > 0
+
+      version = @db[:entity_versions].where(entity_id: entity_id)
+      .select_order_map(:version)
+      .last
+
       @db.transaction do
-        version = @db[:entity_versions].where(entity_id: event.entity_id)
-                                       .select_order_map(:version)
-                                       .last
         if version == nil
           version = 0
-          @db[:entity_versions].insert(entity_id:event.entity_id, entity_type: event.entity_type, version: version)
-        else
-          version += 1
-          @db[:entity_versions].where(entity_id:event.entity_id).update(version: version)
+          @db[:entity_versions].insert(entity_id: entity_id, entity_type: entity_type, version: version)
         end
 
-        @db[:events].insert(name: event.name, entity_type: event.entity_type,
-                            entity_id: event.entity_id, data: event.data,
-                            created_at: event.created_at, version: version)
+        events.each do |event|
 
-        EventSource::Publisher.current.publish(event)
+          version += 1
+          @db[:events].insert(name: event.name, entity_type: event.entity_type,
+                              entity_id: event.entity_id, data: event.data,
+                              created_at: event.created_at, version: version)
+
+          EventSource::Publisher.current.publish(event)
+        end
+
+        @db[:entity_versions].where(entity_id: entity_id).update(version: version)
       end
+
+      true
     end
 
     def get_events(type, uid)
@@ -49,6 +64,15 @@ module EventSource
     end
 
     private
+
+    def are_for_same_id_and_type(events)
+      events.map(&:entity_id).uniq.count == 1 && 
+        events.map(&:entity_type).uniq.count == 1
+    end
+
+    def ensure_are_not_rebuilt(events)
+      events.each {|e| raise CannotSaveRebuiltEvent if e.is_rebuilt}
+    end
 
     def self.default_args
       [in_memory: true]

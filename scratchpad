@@ -1,7 +1,6 @@
 improvements:
-  save events in batch, by entity_type so we don't query the entity's version when saving every event
-    add message queue and publish messages when events are triggered
     add more storage options
+    add message queue and publish messages when events are triggered
     rolling snapshots
     use event store as a queue
         add sequence_number to events table, auto-inc

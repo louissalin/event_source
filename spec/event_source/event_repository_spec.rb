@@ -9,7 +9,8 @@ describe EventSource::EventRepository do
     Sequel.stub(:sqlite).and_return(@db)
 
     @event = double('event', name: 'louis', entity_type: 'account', 
-                    entity_id: 'abc', data: '{}', created_at: time)
+                    entity_id: 'abc', data: '{}', created_at: time,
+                    is_rebuilt: false)
 
     @table = double('events')
     @entity_versions_table = double('entity_versions')
@@ -34,19 +35,25 @@ describe EventSource::EventRepository do
     @sut = EventSource::EventRepository.create(in_memory: true)
   end
 
-  describe 'when saving an event' do
+  describe 'when saving events' do
     describe 'and the uid does not already exist' do
-      before do
-        @result.should_receive(:count).and_return(0)
-      end
-
       it 'should insert the event' do
+        @result.should_receive(:count).and_return(0)
         @entity_versions_table.should_receive(:insert).with(entity_id: 'abc', entity_type: 'account', version: 0)
         @table.should_receive(:insert).with(name: 'louis', entity_type: 'account',
                                             entity_id: 'abc', data: '{}', created_at: time, 
-                                            version: 0)
+                                            version: 1)
+        @version_where.should_receive(:update).with(version: 1)
 
-        @sut.save(@event)
+        @sut.save([@event])
+      end
+
+      it 'should raise an error if the event was recreated from data' do
+        data = {name: 'event', entity_id: 'abc', entity_type: 'account', 
+                created_at: Time.now, data: {}}
+
+        event = EventSource::Event.build_from_data(data)
+        expect {@sut.save([event])}.to raise_error(CannotSaveRebuiltEvent)
       end
     end
 
@@ -54,22 +61,22 @@ describe EventSource::EventRepository do
       it 'should raise an exception if the entity_type is already used with a different uid' do
         @result.should_receive(:count).and_return(1)
 
-        expect {@sut.save(@event)}.to raise_error(InvalidEntityID)
+        expect {@sut.save([@event])}.to raise_error(InvalidEntityID)
       end
     end
 
     describe 'and there are already events for this UID' do
       it 'should increase the version number' do
-        @version_select.stub(:last).and_return(0)
+        @version_select.stub(:last).and_return(1)
 
         @result.should_receive(:count).and_return(0)
-        @entity_versions_table.should_not_receive(:insert).with(entity_id: 'abc', entity_type: 'account', version: 0)
-        @entity_versions_table.should_not_receive(:insert).with(entity_id: 'abc', entity_type: 'account', version: 1)
-        @version_where.should_receive(:update).with(version: 1)
+        @entity_versions_table.should_not_receive(:insert)
         @table.should_receive(:insert).with(name: 'louis', entity_type: 'account',
                                             entity_id: 'abc', data: '{}', created_at: time, 
-                                            version: 1)
-        @sut.save(@event)
+                                            version: 2)
+        @version_where.should_receive(:update).with(version: 2)
+
+        @sut.save([@event])
       end
     end
   end
