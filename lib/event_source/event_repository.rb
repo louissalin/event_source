@@ -24,15 +24,15 @@ module EventSource
 
       raise InvalidEntityID if count > 0
       @db.transaction do
-        version = @db[:entity_versions].where(entity_type: event.entity_type)
+        version = @db[:entity_versions].where(entity_id: event.entity_id)
                                        .select_order_map(:version)
                                        .last
         if version == nil
           version = 0
-          @db[:entity_versions].insert(entity_type: event.entity_type, version: version)
+          @db[:entity_versions].insert(entity_id:event.entity_id, entity_type: event.entity_type, version: version)
         else
           version += 1
-          @db[:entity_versions].where(entity_type: event.entity_type).update(version: version)
+          @db[:entity_versions].where(entity_id:event.entity_id).update(version: version)
         end
 
         @db[:events].insert(name: event.name, entity_type: event.entity_type,

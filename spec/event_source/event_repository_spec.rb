@@ -13,20 +13,23 @@ describe EventSource::EventRepository do
 
     @table = double('events')
     @entity_versions_table = double('entity_versions')
+
     @db.stub(:[]).with(:events).and_return(@table)
     @db.stub(:[]).with(:entity_versions).and_return(@entity_versions_table)
     @db.stub(:transaction).and_yield
 
+    #mock queries on events table
     @result = mock('query_result')
     where = double('where')
     where.stub(:where).with(entity_id: 'abc').and_return(@result)
     @table.stub(:exclude_where).with(entity_type: 'account').and_return(where)
 
+    #mock queries on entity_versions table
     @version_select = double('version_select')
     @version_select.stub(:last).and_return(nil)
     @version_where = double('version_where')
     @version_where.stub(:select_order_map).and_return(@version_select)
-    @entity_versions_table.stub(:where).with(entity_type: 'account').and_return(@version_where)
+    @entity_versions_table.stub(:where).with(entity_id: 'abc').and_return(@version_where)
 
     @sut = EventSource::EventRepository.create(in_memory: true)
   end
@@ -38,7 +41,7 @@ describe EventSource::EventRepository do
       end
 
       it 'should insert the event' do
-        @entity_versions_table.should_receive(:insert).with(entity_type: 'account', version: 0)
+        @entity_versions_table.should_receive(:insert).with(entity_id: 'abc', entity_type: 'account', version: 0)
         @table.should_receive(:insert).with(name: 'louis', entity_type: 'account',
                                             entity_id: 'abc', data: '{}', created_at: time, 
                                             version: 0)
@@ -60,7 +63,8 @@ describe EventSource::EventRepository do
         @version_select.stub(:last).and_return(0)
 
         @result.should_receive(:count).and_return(0)
-        @entity_versions_table.should_not_receive(:insert).with(entity_type: 'account', version: 1)
+        @entity_versions_table.should_not_receive(:insert).with(entity_id: 'abc', entity_type: 'account', version: 0)
+        @entity_versions_table.should_not_receive(:insert).with(entity_id: 'abc', entity_type: 'account', version: 1)
         @version_where.should_receive(:update).with(version: 1)
         @table.should_receive(:insert).with(name: 'louis', entity_type: 'account',
                                             entity_id: 'abc', data: '{}', created_at: time, 
