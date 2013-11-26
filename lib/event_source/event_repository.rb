@@ -66,6 +66,7 @@ module EventSource
       end
 
       @db.create_table :entity_versions do
+        String :entity_id
         String :entity_type
         Integer :version
       end
